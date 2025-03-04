@@ -1,0 +1,53 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class IntervalMerger {
+private:
+    map<int, int> intervals; 
+
+public:
+    void addInterval(int start, int end) {
+        auto it = intervals.lower_bound(start);
+
+        if (it != intervals.begin()) {
+            auto prev = prev(it);
+            if (prev->second >= start) {
+                start = min(start, prev->first);
+                end = max(end, prev->second);
+                intervals.erase(prev);
+            }
+        }
+
+        while (it != intervals.end() && it->first <= end) {
+            end = max(end, it->second);
+            it = intervals.erase(it); 
+        }
+
+        intervals[start] = end;
+    }
+
+    vector<vector<int>> getIntervals() {
+        vector<vector<int>> result;
+        for (auto &interval : intervals) {
+            result.push_back({interval.first, interval.second});
+        }
+        return result;
+    }
+};
+
+int main() {
+    IntervalMerger merger;
+
+    merger.addInterval(1, 5);
+    merger.addInterval(6, 8);
+    merger.addInterval(4, 7);
+
+    vector<vector<int>> mergedIntervals = merger.getIntervals();
+    cout << "Merged Intervals: ";
+    for (auto &interval : mergedIntervals) {
+        cout << "[" << interval[0] << ", " << interval[1] << "] ";
+    }
+    cout << endl;
+
+    return 0;
+}
